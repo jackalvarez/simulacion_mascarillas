@@ -8,7 +8,7 @@ class Simulation:
 		self.repetitions = repetitions
 		self.maxTime = maxTime
 		
-		self.reloj = 0
+		self.clock = 0
 		self.L1 = 0
 		self.D = maxTime
 		self.L1S2 = maxTime
@@ -33,6 +33,11 @@ class Simulation:
 
 		# Para la generación de valores para casos de botar máscara y así
 		self.distribucion_uniforme = Uniform(0,1)
+
+		# Tiempos acumulativos de mascarillas
+		self.acum_empaquetadas = 0
+		self.acum_destruidas = 0
+		self.acum_botadas = 0
 
 		# Contadores para saber cómo salieron mascarillas del sistema
 		self.empaquetadas = 0
@@ -64,7 +69,10 @@ class Simulation:
 			if self.L2 == self.maxTime:
 				self.L2, mask = self.section2Queue[0]
 		else:
+			# Se destruye la máscara
 			self.destruidas += 1
+			self.acum_destruidas += self.clock - mask.init_time
+			del mask
 		if len(self.colaEsperaDesinfeccion) > 0:
 			mask = self.colaEsperaDesinfeccion.pop(0)
 			self.encargado_s1.set_current_mask(self.clock, mask)
@@ -75,7 +83,7 @@ class Simulation:
 	
 	def event_l1s2(self):
 		self.clock = self.L1S2
-		time, mask1, mask2 = self.section1Queue.pop(0)
+		_, mask1, mask2 = self.section1Queue.pop(0)
 		if self.encargado_s1.disponible:
 			self.encargado_s1.set_current_mask(self.clock, mask1)
 			self.colaEsperaDesinfeccion.append(mask2)
@@ -92,7 +100,7 @@ class Simulation:
 
 	def event_l2(self):
 		self.clock = self.L2
-		time, mask = self.section2Queue.pop(0)
+		_, mask = self.section2Queue.pop(0)
 		self.colaEsperaEmpaquetado.append(mask)
 		if len(self.colaEsperaEmpaquetado) > 1 and (self.encargado_s2a.disponible or self.encargado_s2b.disponible):
 			mask1 = self.colaEsperaEmpaquetado.pop(0)
@@ -130,7 +138,10 @@ class Simulation:
 		destino_mascarilla = self.distribucion_uniforme.generate_random_value()
 		if destino_mascarilla < 0.05:
 			# Se botan las dos mascarillas
-			1 == 1
+			self.botadas += 2
+			self.acum_botadas += (self.clock - mask1.init_time) + (self.clock - mask2.init_time)
+			del mask1
+			del mask2
 		elif 0.05 <= destino_mascarilla and destino_mascarilla < 0.25:
 			# Se mandan a desinfectar de nuevo
 			llegada = self.clock + 2
@@ -139,7 +150,10 @@ class Simulation:
 				self.L1S2, mask1, mask2 = self.section1Queue[0]
 		else:
 			# Se logran empaquetar y salen del sistema
-			1 == 1
+			self.empaquetadas += 2
+			self.acum_empaquetadas += (self.clock - mask1.init_time) + (self.clock - mask2.init_time)
+			del mask1
+			del mask2
 		if len(self.colaEsperaEmpaquetado) > 1:
 			mask1 = self.colaEsperaEmpaquetado.pop(0)
 			mask2 = self.colaEsperaEmpaquetado.pop(0)
@@ -157,7 +171,10 @@ class Simulation:
 		destino_mascarilla = self.distribucion_uniforme.generate_random_value()
 		if destino_mascarilla < 0.15:
 			# Se botan las dos mascarillas
-			1 == 1
+			self.botadas += 2
+			self.acum_botadas += (self.clock - mask1.init_time) + (self.clock - mask2.init_time)
+			del mask1
+			del mask2
 		elif 0.15 <= destino_mascarilla and destino_mascarilla < 0.4:
 			# Se mandan a desinfectar de nuevo
 			llegada = self.clock + 2
@@ -166,7 +183,10 @@ class Simulation:
 				self.L1S2, mask1, mask2 = self.section1Queue[0]
 		else:
 			# Se logran empaquetar y salen del sistema
-			1 == 1
+			self.empaquetadas += 2
+			self.acum_empaquetadas += (self.clock - mask1.init_time) + (self.clock - mask2.init_time)
+			del mask1
+			del mask2
 		if len(self.colaEsperaEmpaquetado) > 1:
 			mask1 = self.colaEsperaEmpaquetado.pop(0)
 			mask2 = self.colaEsperaEmpaquetado.pop(0)
