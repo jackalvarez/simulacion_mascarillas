@@ -6,10 +6,8 @@ from sys import exit
 if __name__=="__main__":
     
     repetitions = input('Número de corridas: ')
-    maxTime = input('Tiempo máximo a correr: ')
+    maxTime = float(input('Tiempo máximo a correr: '))
 
 
-    sim = Simulation(repetitions, maxTime)
-    sim.read_distributions()
-    sim.start()
-    sim.print_statistics()
+    sim = Simulation(maxTime)
+    sim.run()

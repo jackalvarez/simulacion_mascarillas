@@ -19,6 +19,7 @@ class Employee:
 
 class EmployeeSection1(Employee):
     def __init__(self):
+        super().__init__()
         self.mask = None
     def set_current_mask(self, init_time, mask):
         self.mask = mask
@@ -29,6 +30,7 @@ class EmployeeSection1(Employee):
 
 class EmployeeSection2(Employee):
     def __init__(self):
+        super().__init__()
         self.mask1 = None
         self.mask2 = None
     def set_current_masks(self, init_time, mask1, mask2):

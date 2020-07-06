@@ -4,7 +4,6 @@ import numpy as np
 
 class Distribution:
     def generate_random_value(self):
-        print("si, pa?")
         return 0
 
 class Uniform(Distribution):
