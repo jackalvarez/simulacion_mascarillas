@@ -12,7 +12,10 @@ class Uniform(Distribution):
         self.a = a
         self.b = b
     def generate_random_value(self):
+        # Se genera un número aleatorio entre 0 y 1
         r = random.random()
+
+        # Se calcula x = r % (b-a+1) + a
         return (r % (self.b -self.a + 1)) + self.a
 
 class DirectNormal(Distribution):
@@ -20,9 +23,14 @@ class DirectNormal(Distribution):
         self.mean = mean
         self.variance = variance
     def generate_random_value(self):
+        # Se generan dos números aleatorios entre 0 y 1
         r_1 = random.random()
         r_2 = random.random()
+
+        # En este caso decidimos utilizar solo la fórmula para z1, con el coseno
         z = math.sqrt(-2 * np.log(r_1)) * math.cos(2 * math.pi * r_2) 
+
+        # Aquí es con la fórmula de  x = sigma * z + mu
         return self.variance * z + self.mean
 
 class ConvolutionNormal(Distribution):
@@ -31,16 +39,25 @@ class ConvolutionNormal(Distribution):
         self.variance = variance
     def generate_random_value(self):
         z = 0
+
+        # Esto es siguiendo la fórmula simplicada que se da en el libro
+        # donde se toma que K = 12, por lo que al final solo tenemos que 
+        # z = sum de 0 a 12 de r_i - 6
         for i in range(12):
             z += random.random() - 6
 
+        # Aquí es con la fórmula de  x = sigma * z + mu
         return self.variance * z + self.mean
 
 class Exponential(Distribution):
     def __init__(self, lambd):
         self.lambd = lambd
     def generate_random_value(self):
+        # Generamos un valor aleatorio entre 0 y 1
         r = random.random()
+
+        # Esto es utilizando la fórmula vista en clases para la
+        # distribución exponencial con el ITM: x = -ln(r)/lambda
         return -1 * (np.log(r)/self.lambd)
 
 class DensityFunction(Distribution):
@@ -52,4 +69,6 @@ class DensityFunction(Distribution):
         # Para que r solo esté en el rango [k*a, k*b]
         r = random.randint(self.k*self.a, self.k*self.b)
 
+        # Esto es después de haber obtenido la integral de f(x) = kx con ITM
+        # Al final se obtuvo que x = sqrt(2r / k)
         return math.sqrt( 2 * r / self.k )
