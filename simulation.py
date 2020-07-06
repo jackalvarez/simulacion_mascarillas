@@ -32,10 +32,10 @@ class Simulation:
 		self.section2Queue = []
 
 		# Distribuciones
-		self.D1 = Distribution()
-		self.D2 = Distribution()
-		self.D3 = Distribution()
-		self.D4 = Distribution()
+		self.D1 = Uniform(1,10)
+		self.D2 = Uniform(1,10)
+		self.D3 = Uniform(1,10)
+		self.D4 = Uniform(1,10)
 
 		# Para la generación de valores para casos de botar máscara y así
 		self.distribucion_uniforme = Uniform(0,1)
@@ -212,6 +212,7 @@ class Simulation:
 			event = self.min_event()
 			if event == "L1":
 				self.event_l1()
+				print("Reloj: " + str(self.clock))
 			elif event == "D":
 				self.event_d()
 			elif event == "L1S2":
@@ -222,7 +223,6 @@ class Simulation:
 				self.event_e1()
 			else:
 				self.event_e2()
-			print("Reloj: " + str(self.clock))
 
 	def min_event(self):
 		return min(self.events, key=self.events.get)

@@ -14,8 +14,8 @@ class Uniform(Distribution):
         # Se genera un número aleatorio entre 0 y 1
         r = random.random()
 
-        # Se calcula x = r % (b-a+1) + a
-        return (r % (self.b -self.a + 1)) + self.a
+        # Se calcula x = r * (b-a+1) + a
+        return (r * (self.b -self.a)) + self.a
 
 class DirectNormal(Distribution):
     def __init__(self, mean, variance):
@@ -41,9 +41,11 @@ class ConvolutionNormal(Distribution):
 
         # Esto es siguiendo la fórmula simplicada que se da en el libro
         # donde se toma que K = 12, por lo que al final solo tenemos que 
-        # z = sum de 0 a 12 de r_i - 6
-        for i in range(12):
-            z += random.random() - 6
+        # z = sum de 0 a 12 de r_i
+        for _ in range(12):
+            z += random.random()
+        # A la suma después se le resta 6
+        z -= 6
 
         # Aquí es con la fórmula de  x = sigma * z + mu
         return self.variance * z + self.mean
@@ -64,9 +66,13 @@ class DensityFunction(Distribution):
         self.a = a
         self.b = b
         self.k = k
+
+        # Para que r solo esté en el rango [f(a), f(b)], es decir, [k*a, k*b]
+        self.uniform = Uniform(self.k * self.a, self.k * self.b)
+
     def generate_random_value(self):
-        # Para que r solo esté en el rango [k*a, k*b]
-        r = random.randint(self.k*self.a, self.k*self.b)
+        # Se obtiene un r entre [f(a), f(b)]
+        r = self.uniform.generate_random_value()
 
         # Esto es después de haber obtenido la integral de f(x) = kx con ITM
         # Al final se obtuvo que x = sqrt(2r / k)
