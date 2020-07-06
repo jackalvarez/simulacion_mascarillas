@@ -1,3 +1,7 @@
+import math
+import random
+import numpy as np
+
 class Distribution:
     def generate_random_value(self):
         print("si, pa?")
@@ -8,31 +12,36 @@ class Uniform(Distribution):
         self.a = a
         self.b = b
     def generate_random_value(self):
-        print("algun dia :v")
-        return 0
+        r = random.random()
+        return (r % (self.b -self.a + 1)) + self.a
 
 class DirectNormal(Distribution):
     def __init__(self, mean, variance):
         self.mean = mean
         self.variance = variance
     def generate_random_value(self):
-        print("algun dia :v")
-        return 0
+        r_1 = random.random()
+        r_2 = random.random()
+        z = math.sqrt(-2 * np.log(r_1)) * math.cos(2 * math.pi * r_2) 
+        return self.variance * z + self.mean
 
 class ConvolutionNormal(Distribution):
     def __init__(self, mean, variance):
         self.mean = mean
         self.variance = variance
     def generate_random_value(self):
-        print("algun dia :v")
-        return 0
+        z = 0
+        for i in range(12):
+            z += random.random() - 6
+
+        return self.variance * z + self.mean
 
 class Exponential(Distribution):
     def __init__(self, lambd):
         self.lambd = lambd
     def generate_random_value(self):
-        print("algun dia :v")
-        return 0
+        r = random.random()
+        return -1 * (np.log(r)/self.lambd)
 
 class DensityFunction(Distribution):
     def __init__(self, a, b, k):
@@ -40,5 +49,7 @@ class DensityFunction(Distribution):
         self.b = b
         self.k = k
     def generate_random_value(self):
-        print("algun dia :v")
-        return 0
+        # Para que r solo esté en el rango [k*a, k*b]
+        r = random.randint(self.k*self.a, self.k*self.b)
+
+        return math.sqrt( 2 * r / self.k )
