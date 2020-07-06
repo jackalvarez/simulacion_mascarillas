@@ -36,16 +36,47 @@ class Simulation:
 		self.clock = self.L1
 
 		if self.encargado1Disponible:
+			# Genera tiempo de desinfección
 			self.D = self.clock + self.D2.generate_random_value()
 		else:
 			self.colaEsperaDesinfeccion += 1
-
+		# Genera tiempo de arribo para siguiente mascarilla
 		self.L1 = self.clock + self.D1.generate_random_value()
 
 	def event_d(self):
 		self.clock = self.D
+		salida_mascara = self.distribucion_uniforme.generate_random_value()
+		if salida_mascara < 0.9:
+			t_llegada_s2 = self.clock + 1
+			self.section2Queue.append(t_llegada_s2)
+			if L2 == self.maxTime:
+				L2 = self.section2Queue[0]
+		else:
+			# Botar mascarilla
+			# Aquí es donde se aumentan los contadores para estadísticas
+			1 == 1
+		if self.colaEsperaDesinfeccion > 0:
+			# Genera tiempo de desinfección
+			self.D = self.clock + self.D2.generate_random_value()
+			self.colaEsperaDesinfeccion -= 1
+		else:
+			self.D = self.maxTime
+	
+	def event_l1s2(self):
+		self.clock = self.L1S2
+		self.section1Queue.remove(self.L1S2)
+		if self.encargado1Disponible:
+			self.encargado1Disponible = False
+			self.colaEsperaDesinfeccion += 1
+			# Genera tiempo de desinfección
+			self.D = self.clock + self.D2.generate_random_value()
+		else:
+			self.colaEsperaDesinfeccion += 2
 
-
+		if len(self.section1Queue) > 0:
+			self.L1S2 = self.section1Queue[0]
+		else:
+			self.L1S2 = self.maxTime
 
 	def start(self):
 		print('Inicia la simulación')
