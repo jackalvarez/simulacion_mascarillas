@@ -53,8 +53,9 @@ class Simulation:
 		self.destruidas = 0
 		self.botadas = 0
 
-	# Arrival of a mask to section 1
+	# Evento de cuando llega una mascarilla a la sección 1
 	def event_l1(self):
+		print("Ingreso al evento l1")
 		self.clock = self.events["L1"]
 		mask = Mask(self.clock)
 
@@ -67,7 +68,9 @@ class Simulation:
 		# Genera tiempo de arribo para siguiente mascarilla
 		self.events["L1"] = self.clock + self.D1.generate_random_value()
 
+	# Evento de desinfección de una mascarilla
 	def event_d(self):
+		print("Ingreso al evento D")
 		self.clock = self.events["D"]
 		mask = self.encargado_s1.mask
 		self.encargado_s1.service_ends(self.clock)
@@ -91,7 +94,9 @@ class Simulation:
 		else:
 			self.events["D"] = self.maxTime
 	
+	# Evento de llegada de un par de mascarillas a sección 1 desde sección 2
 	def event_l1s2(self):
+		print("Ingreso al evento L1S2")
 		self.clock = self.events["L1S2"]
 		_, mask1, mask2 = self.section1Queue.pop(0)
 		if self.encargado_s1.disponible:
@@ -108,7 +113,9 @@ class Simulation:
 		else:
 			self.events["L1S2"] = self.maxTime
 
+	# Evento de llegada de mascarilla a sección 2
 	def event_l2(self):
+		print("Ingreso al evento L2")
 		self.clock = self.events["L2"]
 		_, mask = self.section2Queue.pop(0)
 		self.colaEsperaEmpaquetado.append(mask)
@@ -140,7 +147,9 @@ class Simulation:
 		else:
 			self.events["L2"] = self.maxTime
 
+	# Evento de un par de mascarillas empaquetadas por el encargado 1
 	def event_e1(self):
+		print("Ingreso al evento E1")
 		self.clock = self.events["E1"]
 		mask1 = self.encargado_s2a.mask1
 		mask2 = self.encargado_s2a.mask2
@@ -175,7 +184,9 @@ class Simulation:
 		else:
 			self.events["E1"] = self.maxTime
 
+	# Evento de un par de mascarillas empaquetadas por el encargado 1
 	def event_e2(self):
+		print("Ingreso al evento E2")
 		self.clock = self.events["E2"]
 		mask1 = self.encargado_s2b.mask1
 		mask2 = self.encargado_s2b.mask2
@@ -185,6 +196,7 @@ class Simulation:
 			# Se botan las dos mascarillas
 			if self.clock > self.warm_up_time:
 				self.botadas += 2
+				print('Se botaron 2 mascarillas. El total de mascarillas ahora es: ' + str(self.botadas) )
 				self.acum_botadas += (self.clock - mask1.init_time) + (self.clock - mask2.init_time)
 			del mask1
 			del mask2
@@ -215,7 +227,7 @@ class Simulation:
 			event = self.min_event()
 			if event == "L1":
 				self.event_l1()
-				print("Reloj: " + str(self.clock))
+				#print("Reloj: " + str(self.clock))
 			elif event == "D":
 				self.event_d()
 			elif event == "L1S2":
@@ -231,7 +243,26 @@ class Simulation:
 		return min(self.events, key=self.events.get)
 		
 	def print_statistics(self):
+		masks_lost = self.botadas + self.destruidas
+		total_masks = masks_lost + self.empaquetadas 
+		lost_masks_time = self.acum_botadas + self.acum_destruidas
+		total_mask_time = lost_masks_time + self.acum_empaquetadas
+
 		print("\n\n------------ESTADÍSTICAS DE LA SIMULACIÓN " + str(self.simNumber + 1) + "------------\n")
+		print("Total de máscaras que llegaron: " + str(total_masks))
+		print("Total de máscaras que se botaron (o destruyeron): " + str(masks_lost) )
+		print("\tPorcentaje de máscaras que se botaron: " + str(masks_lost/total_masks * 100) + '%')
 		print("Tiempo que corrieron las simulaciones: " + str(self.clock) + " minutos" )
 		print("Longitud de la cola en sección 1: " + str(len(self.section1Queue)) )
 		print("Longitud de la cola en sección 2: " + str(len(self.section2Queue)) )
+		print("Tiempo promedio que pasa una mascarilla en el sistema antes de botarse o destruirse: " + str(lost_masks_time / total_masks) + " minutos")
+		print("Tiempo promedio que pasa una mascarilla en el sistema antes de empaquetarse: " + str(self.acum_empaquetadas) + " minutos")
+		print("Tiempo promedio que pasa una mascarilla en el sistema en general: " + str(total_mask_time) + " minutos") 
+		print("Eficiencia del sistema: Ws/W")
+		print("Equilibrio del sistema: ")
+		
+		print("Total de máscaras que terminaron listas en un paquete: " + str(self.empaquetadas) )
+		print("\tPorcentaje de máscaras que quedaron listas en un paquete: " + str(self.empaquetadas/total_masks * 100) + '%')
+		print("Porcentaje de tiempo de trabajo real del encargado 1: ")
+		print("Porcentaje de tiempo de trabajo real del encargado 2: ")
+		print("Porcentaje de tiempo de trabajo real del encargado : ")

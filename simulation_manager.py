@@ -50,6 +50,16 @@ class SimulationManager:
             sim = Simulation(i, self.maxTime, self.distributions[0], self.distributions[1], self.distributions[2], self.distributions[3])
             sim.run()
             sim.print_statistics()
+
+    def start_test(self):
+        # Llena las distribuciones por defecto en vez de pedir al usuario que las digite
+        self.distributions.append(Uniform(10, 15))
+        self.distributions.append(Uniform(10, 15))
+        self.distributions.append(Uniform(10, 15))
+        self.distributions.append(Uniform(10, 15))
+
+        # Ahora que se tienen los parámetros, llama a start para que se encargue de la simulación
+        self.start()
         
         
     def print_statistics(self):
