@@ -4,8 +4,10 @@ from mask import Mask
 from employee import Employee, EmployeeSection1, EmployeeSection2
 
 class Simulation:
-	def __init__(self, maxTime):
+	def __init__(self, simNumber, maxTime, D1, D2, D3, D4):
 		self.warm_up_time = 120.0
+		
+		self.simNumber = simNumber
 		self.maxTime = maxTime
 		
 		self.clock = 0
@@ -32,13 +34,14 @@ class Simulation:
 		self.section2Queue = []
 
 		# Distribuciones
-		self.D1 = Uniform(1,10)
-		self.D2 = Uniform(1,10)
-		self.D3 = Uniform(1,10)
-		self.D4 = Uniform(1,10)
+		self.D1 = D1
+		self.D2 = D2
+		self.D3 = D3
+		self.D4 = D4
 
 		# Para la generación de valores para casos de botar máscara y así
-		self.distribucion_uniforme = Uniform(0,1)
+		self.distribucion_uniforme = Uniform()
+		self.distribucion_uniforme.set_parameters(0,1)
 
 		# Tiempos acumulativos de mascarillas
 		self.acum_empaquetadas = 0
@@ -226,3 +229,9 @@ class Simulation:
 
 	def min_event(self):
 		return min(self.events, key=self.events.get)
+		
+	def print_statistics(self):
+		print("\n\n------------ESTADÍSTICAS DE LA SIMULACIÓN " + str(self.simNumber + 1) + "------------\n")
+		print("Tiempo que corrieron las simulaciones: " + str(self.clock) + " minutos" )
+		print("Longitud de la cola en sección 1: " + str(len(self.section1Queue)) )
+		print("Longitud de la cola en sección 2: " + str(len(self.section2Queue)) )

@@ -6,8 +6,11 @@ class Distribution:
     def generate_random_value(self):
         return 0
 
+    def read_distribution(self):
+        print("")
+
 class Uniform(Distribution):
-    def __init__(self, a, b):
+    def __init__(self, a = 0, b = 0):
         self.a = a
         self.b = b
     def generate_random_value(self):
@@ -17,8 +20,17 @@ class Uniform(Distribution):
         # Se calcula x = r * (b-a+1) + a
         return (r * (self.b -self.a)) + self.a
 
+    def read_distribution(self):
+        self.a = float(input('\tPor favor digite el valor para a: '))
+        self.b = float(input('\tPor favor digite el valor para b: '))
+
+    def set_parameters(self, a, b):
+        self.a = a 
+        self.b = b
+
+
 class DirectNormal(Distribution):
-    def __init__(self, mean, variance):
+    def __init__(self, mean = 0, variance = 0):
         self.mean = mean
         self.variance = variance
     def generate_random_value(self):
@@ -32,8 +44,12 @@ class DirectNormal(Distribution):
         # Aquí es con la fórmula de  x = sigma * z + mu
         return self.variance * z + self.mean
 
+    def read_distribution(self):
+        self.mean = float(input('\tPor favor digite el valor para la media: '))
+        self.variance = float(input('\tPor favor digite el valor para la varianza: '))
+
 class ConvolutionNormal(Distribution):
-    def __init__(self, mean, variance):
+    def __init__(self, mean = 0, variance = 0):
         self.mean = mean
         self.variance = variance
     def generate_random_value(self):
@@ -49,9 +65,13 @@ class ConvolutionNormal(Distribution):
 
         # Aquí es con la fórmula de  x = sigma * z + mu
         return self.variance * z + self.mean
+    
+    def read_distribution(self):
+        self.mean = float(input('\tPor favor digite el valor para la media: ') )
+        self.variance = float(input('\tPor favor digite el valor para la varianza: ') )
 
 class Exponential(Distribution):
-    def __init__(self, lambd):
+    def __init__(self, lambd = 0):
         self.lambd = lambd
     def generate_random_value(self):
         # Generamos un valor aleatorio entre 0 y 1
@@ -61,8 +81,11 @@ class Exponential(Distribution):
         # distribución exponencial con el ITM: x = -ln(r)/lambda
         return -1 * (np.log(r)/self.lambd)
 
+    def read_distribution(self):
+        self.mean = float(input('\tPor favor digite el valor para lambda: '))
+
 class DensityFunction(Distribution):
-    def __init__(self, a, b, k):
+    def __init__(self, a = 0, b = 0, k = 0):
         self.a = a
         self.b = b
         self.k = k
@@ -77,3 +100,8 @@ class DensityFunction(Distribution):
         # Esto es después de haber obtenido la integral de f(x) = kx con ITM
         # Al final se obtuvo que x = sqrt(2r / k)
         return math.sqrt( 2 * r / self.k )
+
+    def read_distribution(self):
+        self.a = float(input('\tPor favor digite el valor para a: '))
+        self.b = float(input('\tPor favor digite el valor para b: '))
+        self.k = int(input('\tPor favor digite el valor para k: '))
