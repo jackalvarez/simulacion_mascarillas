@@ -245,6 +245,9 @@ class Simulation:
 				else:
 					self.event_e2()
 
+	def getStatistics(self):
+		return self.botadas, self.destruidas, self.empaquetadas, self.acum_botadas, self.acum_destruidas, self.acum_empaquetadas, self.acum_servicio, self.clock, self.section1Queue, self.section2Queue, self.llegadas, self.encargado_s1.acum_service_time, self.encargado_s2a.acum_service_time, self.encargado_s2b.acum_service_time
+
 	def min_event(self):
 		return min(self.events, key=self.events.get)
 		
