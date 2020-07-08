@@ -55,14 +55,17 @@ class Simulation:
 
 	# Evento de cuando llega una mascarilla a la sección 1
 	def event_l1(self):
-		print("Ingreso al evento l1")
-		self.clock = self.events["L1"]
+		#print("Ingreso al evento L1")
+		
+		# Esta asignación se hace en el ciclo principal
+		# self.clock = self.events["L1"]
 		mask = Mask(self.clock)
 
 		if self.encargado_s1.disponible:
 			# Genera tiempo de desinfección
 			self.encargado_s1.set_current_mask(self.clock, mask)
-			self.D = self.clock + self.D2.generate_random_value()
+			self.events["D"] = self.clock + self.D2.generate_random_value()
+			
 		else:
 			self.colaEsperaDesinfeccion.append(mask)
 		# Genera tiempo de arribo para siguiente mascarilla
@@ -70,8 +73,10 @@ class Simulation:
 
 	# Evento de desinfección de una mascarilla
 	def event_d(self):
-		print("Ingreso al evento D")
-		self.clock = self.events["D"]
+		#print("Ingreso al evento D")
+		
+		# Esta asignación se hace en el ciclo principal
+		# self.clock = self.events["D"]
 		mask = self.encargado_s1.mask
 		self.encargado_s1.service_ends(self.clock)
 		salida_mascara = self.distribucion_uniforme.generate_random_value()
@@ -96,8 +101,10 @@ class Simulation:
 	
 	# Evento de llegada de un par de mascarillas a sección 1 desde sección 2
 	def event_l1s2(self):
-		print("Ingreso al evento L1S2")
-		self.clock = self.events["L1S2"]
+		#print("Ingreso al evento L1S2")
+		
+		# Esta asignación se hace en el ciclo principal
+		# self.clock = self.events["L1S2"]
 		_, mask1, mask2 = self.section1Queue.pop(0)
 		if self.encargado_s1.disponible:
 			self.encargado_s1.set_current_mask(self.clock, mask1)
@@ -115,8 +122,10 @@ class Simulation:
 
 	# Evento de llegada de mascarilla a sección 2
 	def event_l2(self):
-		print("Ingreso al evento L2")
-		self.clock = self.events["L2"]
+		#print("Ingreso al evento L2")
+		
+		# Esta asignación se hace en el ciclo principal
+		# self.clock = self.events["L2"]
 		_, mask = self.section2Queue.pop(0)
 		self.colaEsperaEmpaquetado.append(mask)
 		if len(self.colaEsperaEmpaquetado) > 1 and (self.encargado_s2a.disponible or self.encargado_s2b.disponible):
@@ -149,8 +158,10 @@ class Simulation:
 
 	# Evento de un par de mascarillas empaquetadas por el encargado 1
 	def event_e1(self):
-		print("Ingreso al evento E1")
-		self.clock = self.events["E1"]
+		# print("Ingreso al evento E1")
+
+		# Esta asignación se hace en el ciclo principal
+		# self.clock = self.events["E1"]
 		mask1 = self.encargado_s2a.mask1
 		mask2 = self.encargado_s2a.mask2
 		self.encargado_s2a.service_ends(self.clock)
@@ -186,8 +197,10 @@ class Simulation:
 
 	# Evento de un par de mascarillas empaquetadas por el encargado 1
 	def event_e2(self):
-		print("Ingreso al evento E2")
-		self.clock = self.events["E2"]
+		#print("Ingreso al evento E2")
+
+		# Esta asignación se hace en el ciclo principal
+		# self.clock = self.events["E2"]
 		mask1 = self.encargado_s2b.mask1
 		mask2 = self.encargado_s2b.mask2
 		self.encargado_s2b.service_ends(self.clock)
@@ -196,7 +209,7 @@ class Simulation:
 			# Se botan las dos mascarillas
 			if self.clock > self.warm_up_time:
 				self.botadas += 2
-				print('Se botaron 2 mascarillas. El total de mascarillas ahora es: ' + str(self.botadas) )
+				#print('Se botaron 2 mascarillas. El total de mascarillas ahora es: ' + str(self.botadas) )
 				self.acum_botadas += (self.clock - mask1.init_time) + (self.clock - mask2.init_time)
 			del mask1
 			del mask2
@@ -205,7 +218,7 @@ class Simulation:
 			llegada = self.clock + 2
 			self.section1Queue.append((llegada, mask1, mask2))
 			if self.events["L1S2"] == self.maxTime:
-				self.events["L1S2"], mask1, mask2 = self.section1Queue[0]
+				self.events["L1S2"], _, _ = self.section1Queue[0]
 		else:
 			# Se logran empaquetar y salen del sistema
 			if self.clock > self.warm_up_time:
@@ -224,20 +237,23 @@ class Simulation:
 
 	def run(self):
 		while self.clock < self.maxTime:
+			# El reloj se actualiza dentro de cada evento, entonces siempre se ejecutaba un evento de más
 			event = self.min_event()
-			if event == "L1":
-				self.event_l1()
-				#print("Reloj: " + str(self.clock))
-			elif event == "D":
-				self.event_d()
-			elif event == "L1S2":
-				self.event_l1s2()
-			elif event == "L2":
-				self.event_l2()
-			elif event == "E1":
-				self.event_e1()
-			else:
-				self.event_e2()
+			self.clock = self.events[event]
+			if self.clock < self.maxTime:
+				if event == "L1":
+					self.event_l1()
+					#print("Reloj: " + str(self.clock))
+				elif event == "D":
+					self.event_d()
+				elif event == "L1S2":
+					self.event_l1s2()
+				elif event == "L2":
+					self.event_l2()
+				elif event == "E1":
+					self.event_e1()
+				else:
+					self.event_e2()
 
 	def min_event(self):
 		return min(self.events, key=self.events.get)

@@ -94,7 +94,7 @@ class DensityFunction(Distribution):
         self.uniform = Uniform(self.k * self.a * self.a / 2, self.k * self.b * self.b / 2)
 
     def generate_random_value(self):
-        # Se obtiene un r entre [f(a), f(b)]
+        # Se obtiene un r entre [F(a), F(b)]
         r = self.uniform.generate_random_value()
 
         # Esto es después de haber obtenido la integral de f(x) = kx con ITM
