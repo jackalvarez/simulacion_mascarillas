@@ -13,12 +13,14 @@ class Simulation:
 		self.clock = 0
 
 		# Eventos
-		self.events = {"L1": 0.0, 
+		self.events = {
+					"L1": 0.0, 
 					"D": self.maxTime, 
 					"L1S2": self.maxTime,
 					"L2": self.maxTime,
 					"E1": self.maxTime,
-					"E2": self.maxTime}
+					"E2": self.maxTime
+					}
 
 		# Encargados
 		self.encargado_s1 = EmployeeSection1()
@@ -44,6 +46,7 @@ class Simulation:
 		self.distribucion_uniforme.set_parameters(0,1)
 
 		# Tiempos acumulativos de mascarillas
+		self.acum_servicio = 0
 		self.acum_empaquetadas = 0
 		self.acum_destruidas = 0
 		self.acum_botadas = 0
@@ -90,6 +93,7 @@ class Simulation:
 			if self.clock > self.warm_up_time:
 				self.destruidas += 1
 				self.acum_destruidas += self.clock - mask.init_time
+				self.acum_servicio += mask.cumulative_service_time
 			del mask
 		if len(self.colaEsperaDesinfeccion) > 0:
 			mask = self.colaEsperaDesinfeccion.pop(0)
@@ -158,7 +162,7 @@ class Simulation:
 
 	# Evento de un par de mascarillas empaquetadas por el encargado 1
 	def event_e1(self):
-		# print("Ingreso al evento E1")
+		#print("Ingreso al evento E1")
 
 		# Esta asignación se hace en el ciclo principal
 		# self.clock = self.events["E1"]
@@ -171,6 +175,7 @@ class Simulation:
 			if self.clock > self.warm_up_time:
 				self.botadas += 2
 				self.acum_botadas += (self.clock - mask1.init_time) + (self.clock - mask2.init_time)
+				self.acum_servicio += mask1.cumulative_service_time + mask2.cumulative_service_time
 			del mask1
 			del mask2
 		elif 0.05 <= destino_mascarilla and destino_mascarilla < 0.25:
@@ -184,6 +189,7 @@ class Simulation:
 			if self.clock > self.warm_up_time:
 				self.empaquetadas += 2
 				self.acum_empaquetadas += (self.clock - mask1.init_time) + (self.clock - mask2.init_time)
+				self.acum_servicio += mask1.cumulative_service_time + mask2.cumulative_service_time
 			del mask1
 			del mask2
 		if len(self.colaEsperaEmpaquetado) > 1:
@@ -209,8 +215,8 @@ class Simulation:
 			# Se botan las dos mascarillas
 			if self.clock > self.warm_up_time:
 				self.botadas += 2
-				#print('Se botaron 2 mascarillas. El total de mascarillas ahora es: ' + str(self.botadas) )
 				self.acum_botadas += (self.clock - mask1.init_time) + (self.clock - mask2.init_time)
+				self.acum_servicio += mask1.cumulative_service_time + mask2.cumulative_service_time
 			del mask1
 			del mask2
 		elif 0.15 <= destino_mascarilla and destino_mascarilla < 0.4:
@@ -224,6 +230,7 @@ class Simulation:
 			if self.clock > self.warm_up_time:
 				self.empaquetadas += 2
 				self.acum_empaquetadas += (self.clock - mask1.init_time) + (self.clock - mask2.init_time)
+				self.acum_servicio += mask1.cumulative_service_time + mask2.cumulative_service_time
 			del mask1
 			del mask2
 		if len(self.colaEsperaEmpaquetado) > 1:
@@ -241,6 +248,7 @@ class Simulation:
 			event = self.min_event()
 			self.clock = self.events[event]
 			if self.clock < self.maxTime:
+				#print(str(self.clock) + ": " + event )
 				if event == "L1":
 					self.event_l1()
 					#print("Reloj: " + str(self.clock))
@@ -263,22 +271,23 @@ class Simulation:
 		total_masks = masks_lost + self.empaquetadas 
 		lost_masks_time = self.acum_botadas + self.acum_destruidas
 		total_mask_time = lost_masks_time + self.acum_empaquetadas
+		mean_service_time = self.acum_servicio / total_masks
 
 		print("\n\n------------ESTADÍSTICAS DE LA SIMULACIÓN " + str(self.simNumber + 1) + "------------\n")
 		print("Total de máscaras que llegaron: " + str(total_masks))
-		print("Total de máscaras que se botaron (o destruyeron): " + str(masks_lost) )
-		print("\tPorcentaje de máscaras que se botaron: " + str(masks_lost/total_masks * 100) + '%')
+		print("\tTotal de máscaras que se botaron (o destruyeron): " + str(masks_lost) + " (" + str(round(masks_lost/total_masks * 100, 2)) + "%)")
+		print("\tTotal de máscaras que se empacaron: " + str(self.empaquetadas) + " (" + str(round(self.empaquetadas/total_masks * 100, 2)) + "%)")
 		print("Tiempo que corrieron las simulaciones: " + str(self.clock) + " minutos" )
 		print("Longitud de la cola en sección 1: " + str(len(self.section1Queue)) )
 		print("Longitud de la cola en sección 2: " + str(len(self.section2Queue)) )
 		print("Tiempo promedio que pasa una mascarilla en el sistema antes de botarse o destruirse: " + str(lost_masks_time / total_masks) + " minutos")
 		print("Tiempo promedio que pasa una mascarilla en el sistema antes de empaquetarse: " + str(self.acum_empaquetadas) + " minutos")
 		print("Tiempo promedio que pasa una mascarilla en el sistema en general: " + str(total_mask_time) + " minutos") 
-		print("Eficiencia del sistema: Ws/W")
+		print("Tiempo promedio de servicio para una mascarilla en el sistema en general: " + str(mean_service_time) + " minutos") 
+		print("Eficiencia del sistema (Ws/W): " + str(mean_service_time / total_mask_time))
 		print("Equilibrio del sistema: ")
-		
-		print("Total de máscaras que terminaron listas en un paquete: " + str(self.empaquetadas) )
-		print("\tPorcentaje de máscaras que quedaron listas en un paquete: " + str(self.empaquetadas/total_masks * 100) + '%')
-		print("Porcentaje de tiempo de trabajo real del encargado 1: ")
-		print("Porcentaje de tiempo de trabajo real del encargado 2: ")
-		print("Porcentaje de tiempo de trabajo real del encargado : ")
+
+		print("Porcentaje de tiempo real de trabajo de los empleados:")
+		print("\tEmpleado de sección 1: " + str(round(self.encargado_s1.acum_service_time / self.clock, 2)) )
+		print("\tEmpleado 1 de sección 2: " + str(round(self.encargado_s2a.acum_service_time / self.clock, 2)) )
+		print("\tEmpleado 2 de sección 2: " + str(round(self.encargado_s2b.acum_service_time / self.clock, 2)) )
