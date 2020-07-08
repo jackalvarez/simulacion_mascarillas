@@ -90,8 +90,8 @@ class DensityFunction(Distribution):
         self.b = b
         self.k = k
 
-        # Para que r solo esté en el rango [f(a), f(b)], es decir, [k*a, k*b]
-        self.uniform = Uniform(self.k * self.a, self.k * self.b)
+        # Para que r solo esté en el rango [F(a), F(b)], es decir, [k*a^2/2, k*b^2/2]
+        self.uniform = Uniform(self.k * self.a * self.a / 2, self.k * self.b * self.b / 2)
 
     def generate_random_value(self):
         # Se obtiene un r entre [f(a), f(b)]
