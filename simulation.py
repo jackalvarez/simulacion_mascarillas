@@ -114,7 +114,7 @@ class Simulation:
 			self.encargado_s1.set_current_mask(self.clock, mask1)
 			self.colaEsperaDesinfeccion.append(mask2)
 			# Genera tiempo de desinfección
-			self.D = self.clock + self.D2.generate_random_value()
+			self.events["D"] = self.clock + self.D2.generate_random_value()
 		else:
 			self.colaEsperaDesinfeccion.append(mask1)
 			self.colaEsperaDesinfeccion.append(mask2)
@@ -274,19 +274,18 @@ class Simulation:
 		mean_service_time = self.acum_servicio / total_masks
 
 		print("\n\n------------ESTADÍSTICAS DE LA SIMULACIÓN " + str(self.simNumber + 1) + "------------\n")
-		print("Total de máscaras que llegaron: " + str(total_masks))
-		print("\tTotal de máscaras que se botaron (o destruyeron): " + str(masks_lost) + " (" + str(round(masks_lost/total_masks * 100, 2)) + "%)")
-		print("\tTotal de máscaras que se empacaron: " + str(self.empaquetadas) + " (" + str(round(self.empaquetadas/total_masks * 100, 2)) + "%)")
 		print("Tiempo que corrieron las simulaciones: " + str(self.clock) + " minutos" )
 		print("Longitud de la cola en sección 1: " + str(len(self.section1Queue)) )
 		print("Longitud de la cola en sección 2: " + str(len(self.section2Queue)) )
-		print("Tiempo promedio que pasa una mascarilla en el sistema antes de botarse o destruirse: " + str(lost_masks_time / total_masks) + " minutos")
-		print("Tiempo promedio que pasa una mascarilla en el sistema antes de empaquetarse: " + str(self.acum_empaquetadas) + " minutos")
-		print("Tiempo promedio que pasa una mascarilla en el sistema en general: " + str(total_mask_time) + " minutos") 
+		print("Tiempo promedio que pasa una mascarilla en el sistema antes de botarse o destruirse: " + str(lost_masks_time/masks_lost) + " minutos")
+		print("Tiempo promedio que pasa una mascarilla en el sistema antes de empaquetarse: " + str(self.acum_empaquetadas/self.empaquetadas) + " minutos")
+		print("Tiempo promedio que pasa una mascarilla en el sistema en general: " + str(total_mask_time/total_masks) + " minutos") 
 		print("Tiempo promedio de servicio para una mascarilla en el sistema en general: " + str(mean_service_time) + " minutos") 
-		print("Eficiencia del sistema (Ws/W): " + str(mean_service_time / total_mask_time))
+		print("Eficiencia del sistema (Ws/W): " + str(mean_service_time / total_mask_time * total_masks))
 		print("Equilibrio del sistema: ")
-
+		print("Total de máscaras que llegaron: " + str(total_masks))
+		print("\tTotal de máscaras que se botaron (o destruyeron): " + str(masks_lost) + " (" + str(round(masks_lost/total_masks * 100, 2)) + "%)")
+		print("\tTotal de máscaras que se empacaron: " + str(self.empaquetadas) + " (" + str(round(self.empaquetadas/total_masks * 100, 2)) + "%)")
 		print("Porcentaje de tiempo real de trabajo de los empleados:")
 		print("\tEmpleado de sección 1: " + str(round(self.encargado_s1.acum_service_time / self.clock, 2)) )
 		print("\tEmpleado 1 de sección 2: " + str(round(self.encargado_s2a.acum_service_time / self.clock, 2)) )
