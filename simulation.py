@@ -51,6 +51,9 @@ class Simulation:
 		self.acum_destruidas = 0
 		self.acum_botadas = 0
 
+		# Cantidad de mascarillas que llegaron al sistema
+		self.llegadas = 0
+
 		# Contadores para saber cómo salieron mascarillas del sistema
 		self.empaquetadas = 0
 		self.destruidas = 0
@@ -58,10 +61,9 @@ class Simulation:
 
 	# Evento de cuando llega una mascarilla a la sección 1
 	def event_l1(self):
-		#print("Ingreso al evento L1")
-		
-		# Esta asignación se hace en el ciclo principal
-		# self.clock = self.events["L1"]
+		# Se agrega 1 al contador de mascarillas que han entrado al sistema
+		self.llegadas += 1
+
 		mask = Mask(self.clock)
 
 		if self.encargado_s1.disponible:
@@ -76,10 +78,6 @@ class Simulation:
 
 	# Evento de desinfección de una mascarilla
 	def event_d(self):
-		#print("Ingreso al evento D")
-		
-		# Esta asignación se hace en el ciclo principal
-		# self.clock = self.events["D"]
 		mask = self.encargado_s1.mask
 		self.encargado_s1.service_ends(self.clock)
 		salida_mascara = self.distribucion_uniforme.generate_random_value()
@@ -105,10 +103,6 @@ class Simulation:
 	
 	# Evento de llegada de un par de mascarillas a sección 1 desde sección 2
 	def event_l1s2(self):
-		#print("Ingreso al evento L1S2")
-		
-		# Esta asignación se hace en el ciclo principal
-		# self.clock = self.events["L1S2"]
 		_, mask1, mask2 = self.section1Queue.pop(0)
 		if self.encargado_s1.disponible:
 			self.encargado_s1.set_current_mask(self.clock, mask1)
@@ -126,10 +120,6 @@ class Simulation:
 
 	# Evento de llegada de mascarilla a sección 2
 	def event_l2(self):
-		#print("Ingreso al evento L2")
-		
-		# Esta asignación se hace en el ciclo principal
-		# self.clock = self.events["L2"]
 		_, mask = self.section2Queue.pop(0)
 		self.colaEsperaEmpaquetado.append(mask)
 		if len(self.colaEsperaEmpaquetado) > 1 and (self.encargado_s2a.disponible or self.encargado_s2b.disponible):
@@ -162,10 +152,6 @@ class Simulation:
 
 	# Evento de un par de mascarillas empaquetadas por el encargado 1
 	def event_e1(self):
-		#print("Ingreso al evento E1")
-
-		# Esta asignación se hace en el ciclo principal
-		# self.clock = self.events["E1"]
 		mask1 = self.encargado_s2a.mask1
 		mask2 = self.encargado_s2a.mask2
 		self.encargado_s2a.service_ends(self.clock)
@@ -203,10 +189,6 @@ class Simulation:
 
 	# Evento de un par de mascarillas empaquetadas por el encargado 1
 	def event_e2(self):
-		#print("Ingreso al evento E2")
-
-		# Esta asignación se hace en el ciclo principal
-		# self.clock = self.events["E2"]
 		mask1 = self.encargado_s2b.mask1
 		mask2 = self.encargado_s2b.mask2
 		self.encargado_s2b.service_ends(self.clock)
@@ -282,7 +264,7 @@ class Simulation:
 		print("Tiempo promedio que pasa una mascarilla en el sistema en general: " + str(total_mask_time/total_masks) + " minutos") 
 		print("Tiempo promedio de servicio para una mascarilla en el sistema en general: " + str(mean_service_time) + " minutos") 
 		print("Eficiencia del sistema (Ws/W): " + str(mean_service_time / total_mask_time * total_masks))
-		print("Equilibrio del sistema: ")
+		print("Equilibrio del sistema: " + str(self.llegadas / total_masks) )
 		print("Total de máscaras que llegaron: " + str(total_masks))
 		print("\tTotal de máscaras que se botaron (o destruyeron): " + str(masks_lost) + " (" + str(round(masks_lost/total_masks * 100, 2)) + "%)")
 		print("\tTotal de máscaras que se empacaron: " + str(self.empaquetadas) + " (" + str(round(self.empaquetadas/total_masks * 100, 2)) + "%)")
