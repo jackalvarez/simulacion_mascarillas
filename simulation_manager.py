@@ -92,7 +92,6 @@ class SimulationManager:
 
     def start(self):
         for i in range(self.repetitions):
-            print("Inicia la simulación " + str(i + 1)) 
             sim = Simulation(i, self.maxTime, self.distributions[0], self.distributions[1], self.distributions[2], self.distributions[3])
             sim.run()
             self.get_sim_stats(sim)
@@ -119,7 +118,7 @@ class SimulationManager:
         mean_service_time = self.acum_servicio / total_masks
 
         print("\n\n------------ESTADÍSTICAS FINALES DE LA SIMULACIÓN------------\n")
-        print("Tiempo que corrieron las simulaciones: " + str(round(self.clock)) + " minutos"  )
+        print("Tiempo promedio que corrieron las simulaciones: " + str(round(self.clock/self.repetitions,2)) + " minutos"  )
         print("Longitud promedio de la cola en sección 1: " + str(self.section1QueueSize/self.repetitions) )
         print("Longitud promedio de la cola en sección 2: " + str(self.section2QueueSize/self.repetitions) )
         print("Tiempo promedio que pasa una mascarilla en el sistema antes de botarse o destruirse: " + str( round(lost_masks_time/masks_lost, 2) ) + " minutos")
