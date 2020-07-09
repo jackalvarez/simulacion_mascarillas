@@ -23,9 +23,9 @@ class Simulation:
 					}
 
 		# Encargados
-		self.encargado_s1 = EmployeeSection1()
-		self.encargado_s2a = EmployeeSection2()
-		self.encargado_s2b = EmployeeSection2()
+		self.encargado_s1 = EmployeeSection1(self.warm_up_time)
+		self.encargado_s2a = EmployeeSection2(self.warm_up_time)
+		self.encargado_s2b = EmployeeSection2(self.warm_up_time)
 
 		# Colas en cada en sección
 		self.colaEsperaDesinfeccion = []
