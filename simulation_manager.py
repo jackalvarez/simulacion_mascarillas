@@ -96,6 +96,7 @@ class SimulationManager:
             sim.run()
             self.get_sim_stats(sim)
             sim.print_statistics()
+            character = input("\nDigite cualquier tecla para continuar: ")
 
         self.print_statistics()
 
