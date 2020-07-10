@@ -62,7 +62,8 @@ class Simulation:
 	# Evento de cuando llega una mascarilla a la sección 1
 	def event_l1(self):
 		# Se agrega 1 al contador de mascarillas que han entrado al sistema
-		self.llegadas += 1
+		if self.clock > self.warm_up_time:
+			self.llegadas += 1
 
 		mask = Mask(self.clock)
 
@@ -88,7 +89,7 @@ class Simulation:
 				self.events["L2"], mask = self.section2Queue[0]
 		else:
 			# Se destruye la máscara
-			if self.clock > self.warm_up_time:
+			if mask.init_time > self.warm_up_time:
 				self.destruidas += 1
 				self.acum_destruidas += self.clock - mask.init_time
 				self.acum_servicio += mask.cumulative_service_time
@@ -158,10 +159,14 @@ class Simulation:
 		destino_mascarilla = self.distribucion_uniforme.generate_random_value()
 		if destino_mascarilla < 0.05:
 			# Se botan las dos mascarillas
-			if self.clock > self.warm_up_time:
-				self.botadas += 2
-				self.acum_botadas += (self.clock - mask1.init_time) + (self.clock - mask2.init_time)
-				self.acum_servicio += mask1.cumulative_service_time + mask2.cumulative_service_time
+			if mask1.init_time > self.warm_up_time:
+				self.botadas += 1
+				self.acum_botadas += self.clock - mask1.init_time
+				self.acum_servicio += mask1.cumulative_service_time
+			if mask2.init_time > self.warm_up_time:
+				self.botadas += 1
+				self.acum_botadas += self.clock - mask2.init_time
+				self.acum_servicio += mask2.cumulative_service_time
 			del mask1
 			del mask2
 		elif 0.05 <= destino_mascarilla and destino_mascarilla < 0.25:
@@ -195,10 +200,14 @@ class Simulation:
 		destino_mascarilla = self.distribucion_uniforme.generate_random_value()
 		if destino_mascarilla < 0.15:
 			# Se botan las dos mascarillas
-			if self.clock > self.warm_up_time:
-				self.botadas += 2
-				self.acum_botadas += (self.clock - mask1.init_time) + (self.clock - mask2.init_time)
-				self.acum_servicio += mask1.cumulative_service_time + mask2.cumulative_service_time
+			if mask1.init_time > self.warm_up_time:
+				self.botadas += 1
+				self.acum_botadas += self.clock - mask1.init_time
+				self.acum_servicio += mask1.cumulative_service_time
+			if mask2.init_time > self.warm_up_time:
+				self.botadas += 1
+				self.acum_botadas += self.clock - mask2.init_time
+				self.acum_servicio += mask2.cumulative_service_time
 			del mask1
 			del mask2
 		elif 0.15 <= destino_mascarilla and destino_mascarilla < 0.4:
@@ -258,6 +267,8 @@ class Simulation:
 		total_mask_time = lost_masks_time + self.acum_empaquetadas
 		mean_service_time = self.acum_servicio / total_masks
 
+		stable_system_time = self.clock - self.warm_up_time
+
 		print("\n\n------------ESTADÍSTICAS DE LA SIMULACIÓN " + str(self.simNumber + 1) + "------------\n")
 		print("Tiempo que corrieron las simulaciones: " + str(round(self.clock,2)) + " minutos" )
 		print("Longitud de la cola en sección 1: " + str(len(self.section1Queue)) )
@@ -268,9 +279,9 @@ class Simulation:
 		print("Tiempo promedio de servicio para una mascarilla en el sistema en general: " + str(round(mean_service_time,2)) + " minutos") 
 		print("Eficiencia del sistema (Ws/W): " + str( round(mean_service_time / total_mask_time * total_masks, 2)))
 		print("Equilibrio del sistema: " + str( round(self.llegadas / total_masks,2) ) )
-		print("Total de máscaras que llegaron: " + str(total_masks))
-		print("\tTotal de máscaras que se botaron (o destruyeron): " + str(masks_lost) + " (" + str(round(masks_lost/total_masks * 100, 2)) + "%)")
-		print("\tTotal de máscaras que se empacaron: " + str(self.empaquetadas) + " (" + str(round(self.empaquetadas/total_masks * 100, 2)) + "%)")
+		print("Total de máscaras que llegaron: " + str(self.llegadas))
+		print("\tTotal de máscaras que se botaron (o destruyeron): " + str(masks_lost) + " (" + str(round(masks_lost/self.llegadas * 100, 2)) + "%)")
+		print("\tTotal de máscaras que se empacaron: " + str(self.empaquetadas) + " (" + str(round(self.empaquetadas/self.llegadas * 100, 2)) + "%)")
 		print("Porcentaje de tiempo real de trabajo de los empleados:")
 		print("\tEmpleado de sección 1: " + str(round(self.encargado_s1.acum_service_time / self.clock, 2)) )
 		print("\tEmpleado 1 de sección 2: " + str(round(self.encargado_s2a.acum_service_time / self.clock, 2)) )

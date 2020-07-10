@@ -11,7 +11,7 @@ class Employee:
         self.init_time = init_time
         self.disponible = False
     def end_service(self, end_time):
-        if end_time > self.warm_up_time:
+        if self.init_time > self.warm_up_time:
             self.acum_service_time += (end_time - self.init_time)
         self.init_time = 0
         self.disponible = True
