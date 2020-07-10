@@ -118,9 +118,9 @@ class SimulationManager:
     def start_test(self):
         # Llena las distribuciones por defecto en vez de pedir al usuario que las digite
         self.distributions.append(Exponential(1))
-        self.distributions.append(Exponential(2))
         self.distributions.append(Exponential(3))
-        self.distributions.append(Exponential(4))
+        self.distributions.append(Exponential(2))
+        self.distributions.append(Exponential(2))
 
         # Ahora que se tienen los parámetros, llama a start para que se encargue de la simulación
         self.start()
@@ -142,9 +142,9 @@ class SimulationManager:
         print("Tiempo promedio de servicio para una mascarilla en el sistema: " + str(round(mean_service_time,2)) + " minutos")
         print("Eficiencia promedio del sistema (Ws/W): " + str(round(mean_service_time / total_mask_time * total_masks, 2)))
         print("Equilibrio promedio del sistema: " + str( round(self.llegadas / total_masks, 2) ) )
-        print("Promedio de máscaras que llegaron: " + str(round(total_masks/self.repetitions, 2)) )
-        print("\tPromedio de máscaras que se botaron (o destruyeron): " + str(round(masks_lost/self.repetitions,2)) + " (" + str(round(masks_lost/total_masks * 100, 2)) + "%)")
-        print("\tPromedio de máscaras que se empacaron: " + str(round(self.empaquetadas/self.repetitions,2)) + " (" + str(round(self.empaquetadas/total_masks * 100, 2)) + "%)")
+        print("Promedio de máscaras que llegaron: " + str(round(self.llegadas/self.repetitions, 2)) )
+        print("\tPromedio de máscaras que se botaron (o destruyeron): " + str(round(masks_lost/self.repetitions,2)) + " (" + str(round(masks_lost/self.llegadas * 100, 2)) + "%)")
+        print("\tPromedio de máscaras que se empacaron: " + str(round(self.empaquetadas/self.repetitions,2)) + " (" + str(round(self.empaquetadas/self.llegadas * 100, 2)) + "%)")
         print("Porcentaje promedio de tiempo real de trabajo de los empleados:")
         print("\tTrabajo real promedio del empleado de sección 1: " + str(round(self.employee1Time / self.clock, 2)) )
         print("\tTrabajo real promedio del empleado 1 de sección 2: " + str(round(self.employee2Time / self.clock, 2)) )

@@ -1,21 +1,24 @@
 from mask import Mask
 
 class Employee:
-    def __init__(self):
+    def __init__(self, warm_up_time):
         self.disponible = True
         self.init_time = 0
         self.acum_service_time = 0
+
+        self.warm_up_time = warm_up_time
     def start_service(self, init_time):
         self.init_time = init_time
         self.disponible = False
     def end_service(self, end_time):
-        self.acum_service_time += (end_time - self.init_time)
+        if self.init_time > self.warm_up_time:
+            self.acum_service_time += (end_time - self.init_time)
         self.init_time = 0
         self.disponible = True
 
 class EmployeeSection1(Employee):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, warm_up_time):
+        super().__init__(warm_up_time)
         self.mask = None
     def set_current_mask(self, init_time, mask):
         self.mask = mask
@@ -28,8 +31,8 @@ class EmployeeSection1(Employee):
         super().end_service(end_time)
 
 class EmployeeSection2(Employee):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, warm_up_time):
+        super().__init__(warm_up_time)
         self.mask1 = None
         self.mask2 = None
     def set_current_masks(self, init_time, mask1, mask2):
