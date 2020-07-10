@@ -246,7 +246,13 @@ class Simulation:
 					self.event_e2()
 
 	def getStatistics(self):
-		return self.botadas, self.destruidas, self.empaquetadas, self.acum_botadas, self.acum_destruidas, self.acum_empaquetadas, self.acum_servicio, self.clock, self.section1Queue, self.section2Queue, self.llegadas, self.encargado_s1.acum_service_time, self.encargado_s2a.acum_service_time, self.encargado_s2b.acum_service_time
+		masks_lost = self.botadas + self.destruidas
+		total_masks = masks_lost + self.empaquetadas 
+		lost_masks_time = self.acum_botadas + self.acum_destruidas
+		total_mask_time = lost_masks_time + self.acum_empaquetadas
+		total_mask_time = lost_masks_time + self.acum_empaquetadas
+
+		return self.botadas, self.destruidas, self.empaquetadas, self.acum_botadas, self.acum_destruidas, self.acum_empaquetadas, self.acum_servicio, self.clock, self.section1Queue, self.section2Queue, self.llegadas, self.encargado_s1.acum_service_time, self.encargado_s2a.acum_service_time, self.encargado_s2b.acum_service_time, total_mask_time / total_masks
 
 	def min_event(self):
 		return min(self.events, key=self.events.get)

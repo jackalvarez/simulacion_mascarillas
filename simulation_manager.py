@@ -1,5 +1,6 @@
 from distribution import Distribution, Uniform, DirectNormal, ConvolutionNormal, Exponential, DensityFunction
 from simulation import Simulation
+import math
 
 class SimulationManager:
     def __init__(self, repetitions, maxTime):
@@ -37,6 +38,15 @@ class SimulationManager:
         self.employee1Time = 0
         self.employee2Time = 0
         self.employee3Time = 0
+
+        # Para el tiempo que pasa una mascarilla en el sistema en general
+        self.times = []
+        self.mean_time = 0
+
+        # Para saber cuál es la simulación en la que estoy
+        self.current_sim = 0
+
+
         
     def distribution_factory(self, choice):
         if (choice == 'a'):
@@ -72,7 +82,7 @@ class SimulationManager:
     # Toma los datos que devuelven las demás simulaciones, y se los suma a los contadores actuales
     def get_sim_stats(self, sim):
         # Se llama al método getStatistics(), que devuelve todos los valores de la simulación
-        botadas, destruidas, empaquetadas, acum_botadas, acum_destruidas, acum_empaquetadas, acum_servicio, clock, section1Queue, section2Queue, llegadas, employee1Time, employee2Time, employee3Time = sim.getStatistics()
+        botadas, destruidas, empaquetadas, acum_botadas, acum_destruidas, acum_empaquetadas, acum_servicio, clock, section1Queue, section2Queue, llegadas, employee1Time, employee2Time, employee3Time, mean_time = sim.getStatistics()
         
         # Se asignan todos los valores a las variables totales
         self.botadas += botadas
@@ -89,23 +99,28 @@ class SimulationManager:
         self.employee1Time += employee1Time
         self.employee2Time += employee2Time
         self.employee3Time += employee3Time
+        self.mean_time += mean_time
+
+        # Se asigna el tiempo promedio de cada simulación, porque para el intervalo de confianza ocupamos cada uno de los tiempos
+        self.times.append(mean_time)
 
     def start(self):
         for i in range(self.repetitions):
+            self.current_sim = i
             sim = Simulation(i, self.maxTime, self.distributions[0], self.distributions[1], self.distributions[2], self.distributions[3])
             sim.run()
             self.get_sim_stats(sim)
             sim.print_statistics()
-            character = input("\nDigite cualquier tecla para continuar: ")
+            #character = input("\nDigite cualquier tecla para continuar: ")
 
         self.print_statistics()
 
     def start_test(self):
         # Llena las distribuciones por defecto en vez de pedir al usuario que las digite
-        self.distributions.append(Uniform(3, 6))
-        self.distributions.append(Uniform(1, 3))
-        self.distributions.append(Uniform(1, 3))
-        self.distributions.append(Uniform(1, 3))
+        self.distributions.append(Exponential(1))
+        self.distributions.append(Exponential(2))
+        self.distributions.append(Exponential(3))
+        self.distributions.append(Exponential(4))
 
         # Ahora que se tienen los parámetros, llama a start para que se encargue de la simulación
         self.start()
@@ -124,8 +139,7 @@ class SimulationManager:
         print("Longitud promedio de la cola en sección 2: " + str(self.section2QueueSize/self.repetitions) )
         print("Tiempo promedio que pasa una mascarilla en el sistema antes de botarse o destruirse: " + str( round(lost_masks_time/masks_lost, 2) ) + " minutos")
         print("Tiempo promedio que pasa una mascarilla en el sistema antes de empaquetarse: " + str( round(self.acum_empaquetadas/self.empaquetadas,2) )+ " minutos")
-        print("Tiempo promedio que pasa una mascarilla en el sistema en general: " + str(round(total_mask_time/total_masks, 2))+ " minutos")
-        print("Tiempo promedio de servicio para una mascarilla en el sistema en general: " + str(round(mean_service_time,2)) + " minutos")
+        print("Tiempo promedio de servicio para una mascarilla en el sistema: " + str(round(mean_service_time,2)) + " minutos")
         print("Eficiencia promedio del sistema (Ws/W): " + str(round(mean_service_time / total_mask_time * total_masks, 2)))
         print("Equilibrio promedio del sistema: " + str( round(self.llegadas / total_masks, 2) ) )
         print("Promedio de máscaras que llegaron: " + str(round(total_masks/self.repetitions, 2)) )
@@ -135,3 +149,29 @@ class SimulationManager:
         print("\tTrabajo real promedio del empleado de sección 1: " + str(round(self.employee1Time / self.clock, 2)) )
         print("\tTrabajo real promedio del empleado 1 de sección 2: " + str(round(self.employee2Time / self.clock, 2)) )
         print("\tTrabajo real promedio del empleado 2 de sección 2: " + str(round(self.employee3Time / self.clock, 2)) )
+
+        # Se calculan los valores para el intervalo de confianza
+        media_muestral = self.mean_time/self.repetitions
+        
+        print("Tiempo promedio que pasa una mascarilla en el sistema en general: " + str(round(media_muestral, 2))+ " minutos")
+
+        # Cuando solo hay 10 repeticiones, se calcula e imprime el intervalo de confianza
+        if (self.repetitions == 10):
+            varianza_muestral = 0
+
+            # Se hace la sumatoria de las diferencias con la media para calcular la varianza
+            for i in range(self.repetitions):
+                varianza_muestral += pow((self.times[i] - media_muestral),2)/(self.repetitions-1)
+                #print('El tiempo fue de: ' + str(self.times[i]))
+                #print('La varianza es de: ' + str(varianza_muestral))
+
+            # Este es el valor que se va a sumar y restar para obtener los límites superiores e inferiores
+            rango = 2.26 * math.sqrt(abs(varianza_muestral)/10)
+
+            lim_inferior = media_muestral - rango
+            lim_superior = media_muestral + rango
+
+            #print('\nla media es de: ' + str(media_muestral))
+            #print('la varianza es de: '  +str(varianza_muestral))
+            print("Con un intervalo de confianza de [" + str(round(lim_inferior,4)) + ", " + str(round(lim_superior,4)) + "]")
+        
