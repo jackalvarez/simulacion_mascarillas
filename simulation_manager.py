@@ -3,7 +3,7 @@ from simulation import Simulation
 import math
 
 class SimulationManager:
-    def __init__(self, repetitions = 10, maxTime = 500):
+    def __init__(self, repetitions = 10, maxTime = 5000):
         # Las cantidad de simulaciones a realizar. Por defecto es 10
         self.repetitions = repetitions
 

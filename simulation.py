@@ -177,10 +177,14 @@ class Simulation:
 				self.events["L1S2"], mask1, mask2 = self.section1Queue[0]
 		else:
 			# Se logran empaquetar y salen del sistema
-			if self.clock > self.warm_up_time:
-				self.empaquetadas += 2
-				self.acum_empaquetadas += (self.clock - mask1.init_time) + (self.clock - mask2.init_time)
-				self.acum_servicio += mask1.cumulative_service_time + mask2.cumulative_service_time
+			if mask1.init_time > self.warm_up_time:
+				self.empaquetadas += 1
+				self.acum_empaquetadas += self.clock - mask1.init_time
+				self.acum_servicio += mask1.cumulative_service_time
+			if mask2.init_time > self.warm_up_time:
+				self.empaquetadas += 1
+				self.acum_empaquetadas += self.clock - mask2.init_time
+				self.acum_servicio += mask2.cumulative_service_time
 			del mask1
 			del mask2
 		if len(self.colaEsperaEmpaquetado) > 1:
@@ -218,10 +222,14 @@ class Simulation:
 				self.events["L1S2"], _, _ = self.section1Queue[0]
 		else:
 			# Se logran empaquetar y salen del sistema
-			if self.clock > self.warm_up_time:
-				self.empaquetadas += 2
-				self.acum_empaquetadas += (self.clock - mask1.init_time) + (self.clock - mask2.init_time)
-				self.acum_servicio += mask1.cumulative_service_time + mask2.cumulative_service_time
+			if mask1.init_time > self.warm_up_time:
+				self.empaquetadas += 1
+				self.acum_empaquetadas += self.clock - mask1.init_time
+				self.acum_servicio += mask1.cumulative_service_time
+			if mask2.init_time > self.warm_up_time:
+				self.empaquetadas += 1
+				self.acum_empaquetadas += self.clock - mask2.init_time
+				self.acum_servicio += mask2.cumulative_service_time
 			del mask1
 			del mask2
 		if len(self.colaEsperaEmpaquetado) > 1:
