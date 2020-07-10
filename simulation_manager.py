@@ -3,14 +3,12 @@ from simulation import Simulation
 import math
 
 class SimulationManager:
-    def __init__(self, repetitions, maxTime):
+    def __init__(self, repetitions = 10, maxTime = 500):
+        # Las cantidad de simulaciones a realizar. Por defecto es 10
         self.repetitions = repetitions
-        self.maxTime = maxTime
 
-        self.totalRunTime = 0
-        
-        self.totalQueueSizeSection1 = 0
-        self.totalQueueSizeSection2 = 0
+        # El máximo tiempo que va a correr cada simulación. Por defecto es 500
+        self.maxTime = maxTime
         
         # Distribuciones
         self.distributions = []
@@ -19,6 +17,11 @@ class SimulationManager:
         self.clock = 0
         self.section1QueueSize = 0
         self.section2QueueSize = 0
+
+        self.totalRunTime = 0
+        
+        self.totalQueueSizeSection1 = 0
+        self.totalQueueSizeSection2 = 0
 
         # Tiempos acumulativos de mascarillas
         self.acum_servicio = 0
@@ -46,8 +49,9 @@ class SimulationManager:
         # Para saber cuál es la simulación en la que estoy
         self.current_sim = 0
 
-
-        
+    # Este método crea las instancias de las distintas distribuciones. Recibe
+    # la opción que digitó el usuario y devuelve una distribución del tipo de
+    # distribución acorde  
     def distribution_factory(self, choice):
         if (choice == 'a'):
             return Uniform()
@@ -63,6 +67,8 @@ class SimulationManager:
         return None
         
     def read_distributions(self):
+
+        # Se imprimen las opciones de las distribuciones
         print('Considere las siguientes distribuciones:')
         print('\ta) distribución uniforme en (a,b)')
         print('\tb) distribución normal - método directo')
@@ -70,11 +76,12 @@ class SimulationManager:
         print('\td) distribución exponencial parámetro lambda')
         print('\te) distribución con función de densidad: f(x) = kx')
         
+        # Se pide y registra la distribución deseada para cada una de las 4 distribuciones
         for i in range(4):
-            print('\n')
-            choice = input('\tPor favor digite la letra [a-e] de la distribución que desea para D' + str(i) + ': ')
+            choice = input('\n\tPor favor digite la letra [a-e] de la distribución que desea para D' + str(i) + ': ')
             self.distributions.append( self.distribution_factory(choice))
 
+            # Verificación de que se haya registrado una distribución válida
             if self.distributions[i] is not None:
                 self.distributions[i].read_distribution()
     
@@ -104,6 +111,8 @@ class SimulationManager:
         # Se asigna el tiempo promedio de cada simulación, porque para el intervalo de confianza ocupamos cada uno de los tiempos
         self.times.append(mean_time)
 
+    # Este es el método para iniciar todo el proyecto. Se encarga de que se hagan todas las simulaciones, obtiene las estadísticas,
+    # y llama a los métodos necesarios para que impriman las estadísticas finales.
     def start(self):
         for i in range(self.repetitions):
             self.current_sim = i
@@ -115,24 +124,33 @@ class SimulationManager:
 
         self.print_statistics()
 
-    def start_test(self):
-        # Llena las distribuciones por defecto en vez de pedir al usuario que las digite
-        self.distributions.append(Exponential(1))
-        self.distributions.append(Exponential(3))
-        self.distributions.append(Exponential(2))
-        self.distributions.append(Exponential(2))
+    # Este método llena las distribuciones por defecto en vez de pedir al usuario 
+    # que las digite. Si recibe el parámetro 1, llena con las distribuciones que
+    # se enviaron por correo, con las exponenciales con lambda = 1,3,2,2. Si se 
+    # recibe el modo 2, se corren con las otras distribuciones no exponenciales
+    def start_test(self, mode):
+        # Revisa cuál es el modo con el que se tiene que correr el programa
+        if (mode == 1):
+            self.distributions.append(Exponential(1))
+            self.distributions.append(Exponential(3))
+            self.distributions.append(Exponential(2))
+            self.distributions.append(Exponential(2))
+        else:
+            print("Error, este modo aún no está implementado")
 
         # Ahora que se tienen los parámetros, llama a start para que se encargue de la simulación
         self.start()
         
         
     def print_statistics(self):
+        # Cálculos para las estadísticas
         masks_lost = self.botadas + self.destruidas 
         total_masks = masks_lost + self.empaquetadas 
         lost_masks_time = self.acum_botadas + self.acum_destruidas
         total_mask_time = lost_masks_time + self.acum_empaquetadas
         mean_service_time = self.acum_servicio / total_masks
 
+        # Se imprimen todas las estadísticas con los números redondeados a 2 decimales
         print("\n\n------------ESTADÍSTICAS FINALES DE LA SIMULACIÓN------------\n")
         print("Tiempo promedio que corrieron las simulaciones: " + str(round(self.clock/self.repetitions,2)) + " minutos"  )
         print("Longitud promedio de la cola en sección 1: " + str(self.section1QueueSize/self.repetitions) )
