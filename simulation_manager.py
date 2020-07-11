@@ -135,8 +135,13 @@ class SimulationManager:
             self.distributions.append(Exponential(3))
             self.distributions.append(Exponential(2))
             self.distributions.append(Exponential(2))
+        elif (mode ==2):
+            self.distributions.append(DirectNormal(1.3,0.01))
+            self.distributions.append(Uniform(0.21, 0.9))
+            self.distributions.append(DensityFunction(3, 6, 2/27))
+            self.distributions.append(ConvolutionNormal(4/3, 0.0001))    
         else:
-            print("Error, este modo aún no está implementado")
+            print("Error, modo de prueba incorrecto")
 
         # Ahora que se tienen los parámetros, llama a start para que se encargue de la simulación
         self.start()
