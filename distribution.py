@@ -21,8 +21,14 @@ class Uniform(Distribution):
         return (r * (self.b -self.a)) + self.a
 
     def read_distribution(self):
-        self.a = float(input('\tPor favor digite el valor para a: '))
-        self.b = float(input('\tPor favor digite el valor para b: '))
+        while True:
+            self.a = float(input('\tPor favor digite el valor para a: '))
+            self.b = float(input('\tPor favor digite el valor para b: '))
+
+            if (self.a < self.b): 
+                break
+            else:
+                print("\tError, a debe ser un número menor que b\n")
 
     def set_parameters(self, a, b):
         self.a = a 
@@ -73,6 +79,7 @@ class ConvolutionNormal(Distribution):
 class Exponential(Distribution):
     def __init__(self, lambd = 0):
         self.lambd = lambd
+
     def generate_random_value(self):
         # Generamos un valor aleatorio entre 0 y 1
         r = random.random()
@@ -82,7 +89,7 @@ class Exponential(Distribution):
         return -1 * (np.log(r)/self.lambd)
 
     def read_distribution(self):
-        self.mean = float(input('\tPor favor digite el valor para lambda: '))
+        self.lambd = float(input('\tPor favor digite el valor para lambda: '))
 
 class DensityFunction(Distribution):
     def __init__(self, a = 0, b = 0, k = 0):
@@ -102,6 +109,12 @@ class DensityFunction(Distribution):
         return math.sqrt( 2 * r / self.k )
 
     def read_distribution(self):
-        self.a = float(input('\tPor favor digite el valor para a: '))
-        self.b = float(input('\tPor favor digite el valor para b: '))
-        self.k = int(input('\tPor favor digite el valor para k: '))
+        while True:
+            self.a = float(input('\tPor favor digite el valor para a: '))
+            self.b = float(input('\tPor favor digite el valor para b: '))
+            self.k = float(input('\tPor favor digite el valor para k: '))
+
+            if (self.a < self.b): 
+                break
+            else:
+                print("Error, a debe ser un número menor que b")

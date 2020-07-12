@@ -1,6 +1,8 @@
 from distribution import Distribution, Uniform, DirectNormal, ConvolutionNormal, Exponential, DensityFunction
 from simulation import Simulation
+
 import math
+import string
 
 class SimulationManager:
     def __init__(self, repetitions = 10, maxTime = 5000):
@@ -79,11 +81,17 @@ class SimulationManager:
         # Se pide y registra la distribución deseada para cada una de las 4 distribuciones
         for i in range(4):
             choice = input('\n\tPor favor digite la letra [a-e] de la distribución que desea para D' + str(i) + ': ')
+                
+            # Se va a pedir que seleccione la distribución hasta que digite una opción válida
+            while choice not in  list(string.ascii_lowercase[0:4]):
+                print("\tError. La opción debe ser una letra entre a y e.")
+                choice = input('\n\tPor favor digite la letra [a-e] de la distribución que desea para D' + str(i) + ': ')
+
+            # Se agrega la distribución actual a la lista de distribuciones
             self.distributions.append( self.distribution_factory(choice))
 
-            # Verificación de que se haya registrado una distribución válida
-            if self.distributions[i] is not None:
-                self.distributions[i].read_distribution()
+            # Se llama al método que sabe pedir los parámetros que ocupa la distribución elegida
+            self.distributions[i].read_distribution()
     
     # Este método es el que toma los datos de cada una de las simulaciones, cada vez que estas terminan de ejecutar
     # Toma los datos que devuelven las demás simulaciones, y se los suma a los contadores actuales
