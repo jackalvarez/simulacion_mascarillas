@@ -10,7 +10,7 @@ class Simulation:
 		self.simNumber = simNumber
 		self.maxTime = maxTime
 		
-		self.clock = 0
+		self.clock = 0.0
 
 		# Eventos
 		self.events = {
@@ -42,8 +42,7 @@ class Simulation:
 		self.D4 = D4
 
 		# Para la generación de valores para casos de botar máscara y así
-		self.distribucion_uniforme = Uniform()
-		self.distribucion_uniforme.set_parameters(0,1)
+		self.distribucion_uniforme = Uniform(0,1)
 
 		# Tiempos acumulativos de mascarillas
 		self.acum_servicio = 0

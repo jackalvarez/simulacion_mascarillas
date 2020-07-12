@@ -80,12 +80,12 @@ class SimulationManager:
         
         # Se pide y registra la distribución deseada para cada una de las 4 distribuciones
         for i in range(4):
-            choice = input('\n\tPor favor digite la letra [a-e] de la distribución que desea para D' + str(i) + ': ')
+            choice = input('\n\tPor favor digite la letra [a-e] de la distribución que desea para D' + str(i + 1) + ': ')
                 
             # Se va a pedir que seleccione la distribución hasta que digite una opción válida
-            while choice not in  list(string.ascii_lowercase[0:4]):
+            while choice not in  list(string.ascii_lowercase[0:5]):
                 print("\tError. La opción debe ser una letra entre a y e.")
-                choice = input('\n\tPor favor digite la letra [a-e] de la distribución que desea para D' + str(i) + ': ')
+                choice = input('\n\tPor favor digite la letra [a-e] de la distribución que desea para D' + str(i + 1) + ': ')
 
             # Se agrega la distribución actual a la lista de distribuciones
             self.distributions.append( self.distribution_factory(choice))
@@ -148,11 +148,11 @@ class SimulationManager:
             self.distributions.append(Exponential(3))
             self.distributions.append(Exponential(2))
             self.distributions.append(Exponential(2))
-        elif (mode ==2):
+        elif (mode == 2):
             self.distributions.append(DirectNormal(1.3,0.01))
             self.distributions.append(Uniform(0.21, 0.9))
-            self.distributions.append(DensityFunction(3, 6, 2/27))
-            self.distributions.append(ConvolutionNormal(4/3, 0.0001))    
+            self.distributions.append(DensityFunction(3, 6, 2.0/27.0))
+            self.distributions.append(ConvolutionNormal(4.0/3.0, 0.0001))    
 
         # Ahora que se tienen los parámetros, llama a start para que se encargue de la simulación
         self.start()

@@ -10,9 +10,10 @@ class Distribution:
         print("")
 
 class Uniform(Distribution):
-    def __init__(self, a = 0, b = 0):
+    def __init__(self, a = 0.0, b = 0.0):
         self.a = a
         self.b = b
+        print("Uniform: " + str(self.a) + " " + str(self.b))
     def generate_random_value(self):
         # Se genera un número aleatorio entre 0 y 1
         r = random.random()
@@ -36,9 +37,10 @@ class Uniform(Distribution):
 
 
 class DirectNormal(Distribution):
-    def __init__(self, mean = 0, variance = 0):
+    def __init__(self, mean = 0.0, variance = 0.0):
         self.mean = mean
         self.variance = variance
+        print("DirectNormal: " + str(self.mean) + " " + str(self.variance))
     def generate_random_value(self):
         # Se generan dos números aleatorios entre 0 y 1
         r_1 = random.random()
@@ -55,9 +57,10 @@ class DirectNormal(Distribution):
         self.variance = float(input('\tPor favor digite el valor para la varianza: '))
 
 class ConvolutionNormal(Distribution):
-    def __init__(self, mean = 0, variance = 0):
+    def __init__(self, mean = 0.0, variance = 0.0):
         self.mean = mean
         self.variance = variance
+        print("ConvolutionNormal: " + str(self.mean) + " " + str(self.variance))
     def generate_random_value(self):
         z = 0
 
@@ -77,8 +80,9 @@ class ConvolutionNormal(Distribution):
         self.variance = float(input('\tPor favor digite el valor para la varianza: ') )
 
 class Exponential(Distribution):
-    def __init__(self, lambd = 0):
+    def __init__(self, lambd = 0.0):
         self.lambd = lambd
+        print("Exponential: " + str(self.lambd))
 
     def generate_random_value(self):
         # Generamos un valor aleatorio entre 0 y 1
@@ -92,10 +96,11 @@ class Exponential(Distribution):
         self.lambd = float(input('\tPor favor digite el valor para lambda: '))
 
 class DensityFunction(Distribution):
-    def __init__(self, a = 0, b = 0, k = 0):
+    def __init__(self, a = 0.0, b = 0.0, k = 0.0):
         self.a = a
         self.b = b
         self.k = k
+        print("DensityFunction: " + str(self.a) + " " + str(self.b) + " " + str(self.k))
 
         # Para que r solo esté en el rango [F(a), F(b)], es decir, [k*a^2/2, k*b^2/2]
         self.uniform = Uniform(self.k * self.a * self.a / 2, self.k * self.b * self.b / 2)
@@ -113,6 +118,7 @@ class DensityFunction(Distribution):
             self.a = float(input('\tPor favor digite el valor para a: '))
             self.b = float(input('\tPor favor digite el valor para b: '))
             self.k = float(input('\tPor favor digite el valor para k: '))
+            self.uniform.set_parameters(self.k * self.a * self.a / 2, self.k * self.b * self.b / 2)
 
             if (self.a < self.b): 
                 break
