@@ -3,6 +3,21 @@ from distribution import Distribution, Uniform, DirectNormal, ConvolutionNormal,
 from mask import Mask
 from employee import Employee, EmployeeSection1, EmployeeSection2
 
+"""
+	Clase donde se ejecuta cada corrida de la simulación.
+	Aquí se llevan a cabo los seis eventos definidos:
+		- L1: Llegada de máscaras a la sección 1 por medio externos al sistema.
+		- D: Desinfección de una máscara por el encargado de la sección 1.
+		- L1S2: Llegada de máscaras a la sección 1 que fueron devueltas en la sección 2.
+		- L2: Llegada de máscaras a la sección 2 desde la sección 1.
+		- E1: Empaquetado de pares de máscaras por el encargado 1 de la sección 2.
+		- E1: Empaquetado de pares de máscaras por el encargado 2 de la sección 2.
+
+	Además, en esta clase se lleva el acumulado de tiempos de servicio, 
+	que pasa una máscara en el sistema antes de ser botada, destruida o empaquetada.
+
+	Lleva control del tiempo, para que la simulación solo se ejecute por el tiempo definido por el usuario.
+"""
 class Simulation:
 	def __init__(self, simNumber, maxTime, D1, D2, D3, D4):
 		self.warm_up_time = 120.0
@@ -41,7 +56,7 @@ class Simulation:
 		self.D3 = D3
 		self.D4 = D4
 
-		# Para la generación de valores para casos de botar máscara y así
+		# Para la generación de valores para casos en que se bota la máscara o se manda a desinfectar de nuevo, etc.
 		self.distribucion_uniforme = Uniform(0,1)
 
 		# Tiempos acumulativos de mascarillas
@@ -261,6 +276,8 @@ class Simulation:
 				else:
 					self.event_e2()
 
+	# Método para obtener valores necesarios para las estadísticas promedio de todas las corridas. Se obtienen valores como
+	# el total de máscaras que se destruyeron o botaron, el total de máscaras que salieron y acumulados de tiempos de máscaras.
 	def getStatistics(self):
 		masks_lost = self.botadas + self.destruidas
 		total_masks = masks_lost + self.empaquetadas 
@@ -270,9 +287,11 @@ class Simulation:
 
 		return self.botadas, self.destruidas, self.empaquetadas, self.acum_botadas, self.acum_destruidas, self.acum_empaquetadas, self.acum_servicio, self.clock, self.section1Queue, self.section2Queue, self.llegadas, self.encargado_s1.acum_service_time, self.encargado_s2a.acum_service_time, self.encargado_s2b.acum_service_time, total_mask_time / total_masks
 
+	# Método que obtiene el evento con la programación mínima, es decir, que está más pronto a ocurrir.
 	def min_event(self):
 		return min(self.events, key=self.events.get)
 		
+	# Método que imprime las estadísticas de la corrida en particular.
 	def print_statistics(self):
 		masks_lost = self.botadas + self.destruidas
 		total_masks = masks_lost + self.empaquetadas 
