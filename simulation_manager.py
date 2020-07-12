@@ -128,7 +128,7 @@ class SimulationManager:
             sim.run()
             self.get_sim_stats(sim)
             sim.print_statistics()
-            #character = input("\nDigite cualquier tecla para continuar: ")
+            input("\nDigite cualquier tecla para continuar con la siguiente simulación: ")
 
         self.print_statistics()
 
@@ -138,6 +138,11 @@ class SimulationManager:
     # recibe el modo 2, se corren con las otras distribuciones no exponenciales
     def start_test(self, mode):
         # Revisa cuál es el modo con el que se tiene que correr el programa
+
+        while( mode != 1 and mode != 2):
+            print("Error, modo de prueba incorrecto")
+            mode = int(input("Por favor digite el número de distribuciones a probar (exponenciales = 1, normales = 2): "))
+
         if (mode == 1):
             self.distributions.append(Exponential(1))
             self.distributions.append(Exponential(3))
@@ -148,8 +153,6 @@ class SimulationManager:
             self.distributions.append(Uniform(0.21, 0.9))
             self.distributions.append(DensityFunction(3, 6, 2/27))
             self.distributions.append(ConvolutionNormal(4/3, 0.0001))    
-        else:
-            print("Error, modo de prueba incorrecto")
 
         # Ahora que se tienen los parámetros, llama a start para que se encargue de la simulación
         self.start()
