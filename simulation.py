@@ -20,7 +20,7 @@ from employee import Employee, EmployeeSection1, EmployeeSection2
 """
 class Simulation:
 	def __init__(self, simNumber, maxTime, D1, D2, D3, D4):
-		self.warm_up_time = 120.0
+		self.warm_up_time = 120
 		
 		self.simNumber = simNumber
 		self.maxTime = maxTime
@@ -285,7 +285,7 @@ class Simulation:
 		total_mask_time = lost_masks_time + self.acum_empaquetadas
 		total_mask_time = lost_masks_time + self.acum_empaquetadas
 
-		return self.botadas, self.destruidas, self.empaquetadas, self.acum_botadas, self.acum_destruidas, self.acum_empaquetadas, self.acum_servicio, self.clock, self.section1Queue, self.section2Queue, self.llegadas, self.encargado_s1.acum_service_time, self.encargado_s2a.acum_service_time, self.encargado_s2b.acum_service_time, total_mask_time / total_masks
+		return self.botadas, self.destruidas, self.empaquetadas, self.acum_botadas, self.acum_destruidas, self.acum_empaquetadas, self.acum_servicio, self.clock-self.warm_up_time, self.section1Queue, self.section2Queue, self.llegadas, self.encargado_s1.acum_service_time, self.encargado_s2a.acum_service_time, self.encargado_s2b.acum_service_time, total_mask_time / total_masks
 
 	# Método que obtiene el evento con la programación mínima, es decir, que está más pronto a ocurrir.
 	def min_event(self):
@@ -302,7 +302,7 @@ class Simulation:
 		stable_system_time = self.clock - self.warm_up_time
 
 		print("\n\n------------ESTADÍSTICAS DE LA SIMULACIÓN " + str(self.simNumber + 1) + "------------\n")
-		print("Tiempo que corrieron las simulaciones: " + str(round(self.clock,2)) + " minutos" )
+		print("Tiempo que corrieron las simulaciones: " + str(round(stable_system_time,2)) + " minutos" )
 		print("Longitud de la cola en sección 1: " + str(len(self.section1Queue)) )
 		print("Longitud de la cola en sección 2: " + str(len(self.section2Queue)) )
 		print("Tiempo promedio que pasa una mascarilla en el sistema antes de botarse o destruirse: " + str(round(lost_masks_time/masks_lost,2)) + " minutos")
